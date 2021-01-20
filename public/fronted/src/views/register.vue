@@ -40,11 +40,15 @@
           >注册</el-button
         >
       </el-form-item>
+      <router-link class="toLogin" to="login">已有账号？立即登录</router-link>
     </el-form>
   </div>
 </template>
 
 <script>
+import crypto from "crypto";
+import { apiRegister } from "/src/api/register.js";
+
 export default {
   data() {
     let validatePass = (rule, value, callback) => {
@@ -92,7 +96,13 @@ export default {
     };
   },
   methods: {
-    submitForm() {},
+    submitForm() {
+      let md5 = crypto.createHash("md5");
+      this.form.pass = md5.update(this.form.pass).digest("hex");
+      apiRegister(this.form).then((res) => {
+        console.log(res);
+      });
+    },
   },
 };
 </script>
@@ -110,6 +120,11 @@ export default {
     width: 20rem;
     .register-btn {
       width: 100%;
+    }
+    .toLogin {
+      float: right;
+      color: #999;
+      font-size: 0.9rem;
     }
   }
 }

@@ -1,9 +1,18 @@
-var express = require('express');
-var router = express.Router();
+var User = require('../models/user.js')
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+// 因为是单页应用 所有请求都走/dist/index.html
+// module.exports = function (app) {
+//   app.get('*', function (req, res) {
+//     const html = fs.readFileSync(path.resolve(__dirname, '../dist/index.html'), 'utf-8')
+//   res.send(html)
+//   });
+// };
 
-module.exports = router;
+module.exports = function (app) {
+  app.post('/register', function (req, res) {
+    // let name = req.body.name;
+    // let password = req.body.password;
+    // let 
+    res.send('register')
+  });
+};

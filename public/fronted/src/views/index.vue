@@ -16,6 +16,7 @@
         ><router-link to="register">注册</router-link></el-menu-item
       >
     </el-menu>
+    主页
   </div>
 </template>
 
