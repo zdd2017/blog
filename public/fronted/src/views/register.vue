@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import crypto from "crypto";
 import { apiRegister } from "/src/api/register.js";
 
 export default {
@@ -97,8 +96,6 @@ export default {
   },
   methods: {
     submitForm() {
-      let md5 = crypto.createHash("md5");
-      this.form.pass = md5.update(this.form.pass).digest("hex");
       apiRegister(this.form).then((res) => {
         console.log(res);
       });

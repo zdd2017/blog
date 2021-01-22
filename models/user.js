@@ -1,9 +1,19 @@
 var mongodb = require('./db');
+var db = require('./db');
+
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+// Connection URL
+const url = 'mongodb://localhost:27017';
+
+// Database Name
+const dbName = 'blog';
 
 function User(user) {
     this.name = user.name;
-    this.password = user.password;
-    this.email = user.email;
+    this.pass = user.pass;
+    // this.email = user.email;
 };
 
 module.exports = User;
@@ -11,59 +21,56 @@ module.exports = User;
 //存储用户信息
 User.prototype.save = function (callback) {
     //要存入数据库的用户文档
-    var user = {
+    let user = {
         name: this.name,
-        password: this.password,
-        email: this.email
+        pass: this.pass,
+        // email: this.email
     };
-    //打开数据库
-    mongodb.open(function (err, db) {
-        if (err) {
-            return callback(err);//错误，返回 err 信息
-        }
-        //读取 users 集合
-        db.collection('users', function (err, collection) {
-            if (err) {
-                mongodb.close();
-                return callback(err);//错误，返回 err 信息
-            }
-            //将用户数据插入 users 集合
-            collection.insert(user, {
-                safe: true
-            }, function (err, user) {
-                mongodb.close();
-                if (err) {
-                    return callback(err);//错误，返回 err 信息
-                }
-                callback(null, user[0]);//成功！err 为 null，并返回存储后的用户文档
-            });
+    const insertDocuments = function (db, callback) {
+        // Get the documents collection
+        const collection = db.collection('documents');
+        // Insert some documents
+        collection.insertMany([
+            user
+        ], function (err, result) {
+            assert.strictEqual(err, null);
+            assert.strictEqual(1, result.result.n);
+            assert.strictEqual(1, result.ops.length);
+            console.log("Inserted 1 documents into the collection");
+            console.log(result, 'result1')
+            callback(err, result);
+        });
+    }
+
+    // Use connect method to connect to the server
+    MongoClient.connect(url, function (err, client) {
+        assert.strictEqual(null, err);
+        console.log("Connected successfully to server");
+
+        const db = client.db(dbName);
+
+        insertDocuments(db, function () {
+            client.close();
         });
     });
 };
 
 //读取用户信息
 User.get = function (name, callback) {
-    //打开数据库
-    mongodb.open(function (err, db) {
-        if (err) {
-            return callback(err);//错误，返回 err 信息
-        }
-        //读取 users 集合
-        db.collection('users', function (err, collection) {
-            if (err) {
-                mongodb.close();
-                return callback(err);//错误，返回 err 信息
-            }
-            //查找用户名（name键）值为 name 一个文档
-            collection.findOne({
-                name: name
-            }, function (err, user) {
-                mongodb.close();
-                if (err) {
-                    return callback(err);//失败！返回 err 信息
-                }
-                callback(null, user);//成功！返回查询的用户信息
-            });
+    // Use connect method to connect to the server
+    MongoClient.connect(url, function (err, client) {
+        assert.strictEqual(null, err);
+        console.log("Connected correctly to server");
+
+        const db = client.db(dbName);
+
+        const collection = db.collection('documents');
+        // Find some documents
+        collection.find({ 'name': name }).toArray(function (err, docs) {
+            assert.strictEqual(err, null);
+            console.log("Found the following records");
+            console.log(docs);
+            callback(err, docs);
         });
     });
 };

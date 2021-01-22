@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function apiRegister() {
+export function apiRegister(data) {
     return request({
         url: '/register',
         // url: '/rest/version/get/newlest',
-        method: 'post'
+        method: 'post',
+        data
     })
 }

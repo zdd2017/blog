@@ -1,3 +1,4 @@
+var crypto = require('crypto')
 var User = require('../models/user.js')
 
 // 因为是单页应用 所有请求都走/dist/index.html
@@ -10,9 +11,46 @@ var User = require('../models/user.js')
 
 module.exports = function (app) {
   app.post('/register', function (req, res) {
-    // let name = req.body.name;
-    // let password = req.body.password;
-    // let 
-    res.send('register')
+    let name = req.body.name;
+    let pass = req.body.pass;
+    let checkPass = req.body.checkPass;
+    // 验证两次输入密码是否一致
+    if (pass !== checkPass) {
+      req.flash('error', '两次输入的密码不一致！')
+    }
+    // 对密码进行加密
+    let md5 = crypto.createHash('md5')
+    pass = md5.update(pass).digest('hex')
+    let user = new User({
+      'name': name,
+      'pass': pass
+    })
+
+    // 判断用户是否已存在
+    User.get(user.name, function (err, userInfo) {
+      if (err) {
+        req.flash('error', err);
+        return
+      }
+      if (userInfo.length) {
+        req.flash('error', '用户名已存在！')
+        res.send({
+          retcode: 10001,
+          text: '用户已存在',
+          value: {}
+        })
+        return;
+      }
+      // 新增用户
+      user.save(function (err, result) {
+        console.log(result, 'result')
+        if (err) {
+          req.flash('error', err)
+          return;
+        }
+        req.session.user = user; //用户信息存入 session
+        req.flash('success', '注册成功！')
+      })
+    })
   });
 };
