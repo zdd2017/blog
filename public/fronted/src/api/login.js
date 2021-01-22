@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function apiRegister(data) {
+export function apiLogin(data) {
     return request({
-        url: '/register',
+        url: '/login',
         method: 'post',
         data
     })

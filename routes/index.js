@@ -53,4 +53,46 @@ module.exports = function (app) {
       })
     })
   });
+
+  app.post('/login', function (req, res) {
+    let name = req.body.name;
+    let pass = req.body.pass;
+
+    // 对密码进行加密
+    let md5 = crypto.createHash('md5');
+    pass = md5.update(pass).digest('hex');
+
+    let user = new User({
+      'name': name,
+      'pass': pass
+    })
+    // 查询密码是否正确
+    User.get(user.name, function (err, userInfo) {
+      if (err) {
+        req.flash('error', err);
+        return
+      }
+      if (!userInfo.length) {
+        res.send({
+          retcode: 10001,
+          text: '用户名不存在',
+          value: {}
+        })
+        return;
+      }
+      if (userInfo[0].pass !== pass) {
+        console.log(userInfo[0].pass, pass)
+        res.send({
+          retcode: 10001,
+          text: '用户名或密码错误',
+          value: {}
+        })
+        return;
+      }
+      res.send({
+        retcode: 0,
+        value: userInfo[0]
+      })
+    })
+  })
 };

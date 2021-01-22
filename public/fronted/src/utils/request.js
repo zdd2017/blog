@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
+// import { Store } from 'express-session'
+import store from '../store'
 
 // 创建axios实例
 const service = axios.create({
@@ -9,6 +11,15 @@ const service = axios.create({
 
 // console.log(process.env, 'BASE')
 // request拦截器
+service.interceptors.request.use(
+    request => {
+        if (store.getters.token) {
+            console.log('set token')
+            request.headers['token'] = store.getters.token;
+        }
+        return request;
+    }
+)
 
 // response 拦截器
 service.interceptors.response.use(

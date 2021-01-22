@@ -5,7 +5,7 @@
       :model="form"
       status-icon
       :rules="rules"
-      ref="form"
+      ref="loginForm"
       label-width="100px"
     >
       <el-form-item label-width="0" prop="name">
@@ -25,7 +25,7 @@
       </el-form-item>
 
       <el-form-item label-width="0">
-        <el-button class="register-btn" type="primary" @click="login('form')"
+        <el-button class="register-btn" type="primary" @click="login()"
           >登录</el-button
         >
       </el-form-item>
@@ -68,7 +68,13 @@ export default {
   },
   methods: {
     login() {
-      this.$router.push({ name: "index" });
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          this.$store.dispatch("Login", this.form).then(() => {
+            // this.$router.push({ name: "index" });
+          });
+        }
+      });
     },
   },
 };
