@@ -9,7 +9,33 @@ var User = require('../models/user.js')
 //   });
 // };
 
+// const checkLogin = function (req, res, next) {
+//   if (!req.session.user) {
+//     res.send({
+//       retcode: 10001,
+//       text: '未登录',
+//       value: {}
+//     });
+//     return;
+//   }
+//   next();
+// }
+
+const checkNotLogin = function (req, res, next) {
+  console.log(req.session.user)
+  if (req.session.user) {
+    res.send({
+      retcode: 10001,
+      text: '已登录',
+      value: {}
+    });
+    return;
+  }
+  next();
+}
+
 module.exports = function (app) {
+  // app.use('/register', checkNotLogin)
   app.post('/register', function (req, res) {
     let name = req.body.name;
     let pass = req.body.pass;
@@ -54,10 +80,10 @@ module.exports = function (app) {
     })
   });
 
+  app.post('/login', checkNotLogin)
   app.post('/login', function (req, res) {
     let name = req.body.name;
     let pass = req.body.pass;
-
     // 对密码进行加密
     let md5 = crypto.createHash('md5');
     pass = md5.update(pass).digest('hex');
@@ -89,6 +115,8 @@ module.exports = function (app) {
         })
         return;
       }
+      //用户名密码都匹配后，将用户信息存入 session
+      req.session.user = user;
       res.send({
         retcode: 0,
         value: userInfo[0]

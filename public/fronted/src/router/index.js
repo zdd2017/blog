@@ -4,7 +4,6 @@ import Index from '@/views/index'
 import Login from '@/views/login'
 import Register from '@/views/register'
 
-console.log(Index, 'index')
 Vue.use(Router)
 
 const routes = [{
@@ -13,14 +12,23 @@ const routes = [{
 }, {
     name: 'index',
     path: '/index',
+    meta: {
+        requiresLogin: true
+    },
     component: Index,
 }, {
     name: 'login',
     path: '/login',
+    meta: {
+        requiresNotLogin: true
+    },
     component: Login
 }, {
     name: 'register',
     path: '/register',
+    meta: {
+        requiresNotLogin: true
+    },
     component: Register
 }]
 

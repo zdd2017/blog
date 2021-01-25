@@ -69,7 +69,7 @@ User.get = function (name, callback) {
         collection.find({ 'name': name }).toArray(function (err, docs) {
             assert.strictEqual(err, null);
             console.log("Found the following records");
-            console.log(docs);
+            // console.log(docs);
             callback(err, docs);
         });
     });

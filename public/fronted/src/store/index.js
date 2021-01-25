@@ -7,7 +7,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         token: '',
-        userInfo: ''
+        userInfo: '',
+        isLoggedIn: false
     },
     mutations: {
         // 改变token
@@ -26,6 +27,10 @@ const store = new Vuex.Store({
                 commit('SET_USER', res.value.userInfo)
             })
         }
+    },
+    getters: {
+        // !!将state.token强制转换为布尔值，若state.token存在且不为空(已登录)则返回true，反之返回false
+        isLoggedIn: state => !!state.token
     }
 })
 
