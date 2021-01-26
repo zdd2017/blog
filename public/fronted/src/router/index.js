@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Index from '@/views/index'
 import Login from '@/views/login'
 import Register from '@/views/register'
+import Post from '@/views/post'
 
 Vue.use(Router)
 
@@ -30,6 +31,13 @@ const routes = [{
         requiresNotLogin: true
     },
     component: Register
+}, {
+    name: 'post',
+    path: '/post',
+    meta: {
+        requiresLogin: true
+    },
+    component: Post
 }]
 
 export default new Router({ routes })

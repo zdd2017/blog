@@ -1,5 +1,6 @@
 var crypto = require('crypto')
 var User = require('../models/user.js')
+const Jwt = require('../utils/jwt')
 
 // 因为是单页应用 所有请求都走/dist/index.html
 // module.exports = function (app) {
@@ -9,33 +10,36 @@ var User = require('../models/user.js')
 //   });
 // };
 
-// const checkLogin = function (req, res, next) {
-//   if (!req.session.user) {
-//     res.send({
-//       retcode: 10001,
-//       text: '未登录',
-//       value: {}
-//     });
-//     return;
-//   }
-//   next();
-// }
+const checkLogin = function (req, res, next) {
+  let token = req.headers.token;
+  let jwt = new Jwt(token);
+  let result = jwt.verifyToken();
+  // 如果考验通过就next，否则就返回登陆信息不正确
+  if (result == 'err') {
+    console.log(result);
+    res.send({ retcode: 403, text: '登录已过期,请重新登录' });
+    // res.render('login.html');
+  } else {
+    next();
+  }
+}
 
 const checkNotLogin = function (req, res, next) {
-  console.log(req.session.user)
-  if (req.session.user) {
-    res.send({
-      retcode: 10001,
-      text: '已登录',
-      value: {}
-    });
-    return;
+  let token = req.headers.token;
+  let jwt = new Jwt(token);
+  let result = jwt.verifyToken();
+  // 如果考验通过就next，否则就返回登陆信息不正确
+  if (result != 'err') {
+    console.log(result);
+    res.send({ retcode: 403, text: '请先退出登录' });
+    // res.render('login.html');
+  } else {
+    next();
   }
-  next();
 }
 
 module.exports = function (app) {
-  // app.use('/register', checkNotLogin)
+  app.post('/register', checkNotLogin)
   app.post('/register', function (req, res) {
     let name = req.body.name;
     let pass = req.body.pass;
@@ -74,7 +78,7 @@ module.exports = function (app) {
           req.flash('error', err)
           return;
         }
-        req.session.user = user; //用户信息存入 session
+        // req.session.user = user; //用户信息存入 session
         req.flash('success', '注册成功！')
       })
     })
@@ -93,11 +97,8 @@ module.exports = function (app) {
       'pass': pass
     })
     // 查询密码是否正确
-    User.get(user.name, function (err, userInfo) {
-      if (err) {
-        req.flash('error', err);
-        return
-      }
+    User.get(user.name).then(userInfo => {
+
       if (!userInfo.length) {
         res.send({
           retcode: 10001,
@@ -116,11 +117,17 @@ module.exports = function (app) {
         return;
       }
       //用户名密码都匹配后，将用户信息存入 session
-      req.session.user = user;
+      // req.session.user = user;
+      // 登陆成功，添加token验证
+      let _id = userInfo[0]._id.toString();
+      // 将用户id传入并生成token
+      let jwt = new Jwt(_id);
+      let token = jwt.generateToken();
       res.send({
         retcode: 0,
-        value: userInfo[0]
+        value: userInfo[0],
+        token: token
       })
     })
   })
-};
+}

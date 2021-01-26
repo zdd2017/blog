@@ -23,14 +23,15 @@ const store = new Vuex.Store({
         Login({ commit }, userInfo) {
             console.log("login")
             apiLogin(userInfo).then(res => {
-                commit('SET_TOKEN', res.value.token)
+                commit('SET_TOKEN', res.token)
                 commit('SET_USER', res.value.userInfo)
             })
         }
     },
     getters: {
         // !!将state.token强制转换为布尔值，若state.token存在且不为空(已登录)则返回true，反之返回false
-        isLoggedIn: state => !!state.token
+        isLoggedIn: state => !!state.token,
+        token: state => state.token
     }
 })
 

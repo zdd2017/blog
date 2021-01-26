@@ -56,21 +56,28 @@ User.prototype.save = function (callback) {
 };
 
 //读取用户信息
-User.get = function (name, callback) {
-    // Use connect method to connect to the server
-    MongoClient.connect(url, function (err, client) {
-        assert.strictEqual(null, err);
-        console.log("Connected correctly to server");
+// 将回调函数改成promise形式
+User.get = function (name) {
+    return new Promise((resolve, reject) => {
+        // Use connect method to connect to the server
+        MongoClient.connect(url, function (err, client) {
+            assert.strictEqual(null, err);
+            console.log("Connected correctly to server");
 
-        const db = client.db(dbName);
+            const db = client.db(dbName);
 
-        const collection = db.collection('documents');
-        // Find some documents
-        collection.find({ 'name': name }).toArray(function (err, docs) {
-            assert.strictEqual(err, null);
-            console.log("Found the following records");
-            // console.log(docs);
-            callback(err, docs);
+            const collection = db.collection('documents');
+            // Find some documents
+            collection.find({ 'name': name }).toArray(function (err, docs) {
+                assert.strictEqual(err, null);
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(docs)
+                    // callback(err, docs);
+                }
+            });
         });
-    });
+    })
+
 };
