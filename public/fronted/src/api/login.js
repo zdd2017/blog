@@ -7,3 +7,10 @@ export function apiLogin(data) {
         data
     })
 }
+
+// export function apiLogout() {
+//     return request({
+//         url: '/logout',
+//         method: 'post'
+//     })
+// }

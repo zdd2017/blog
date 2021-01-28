@@ -1,5 +1,6 @@
-var crypto = require('crypto')
-var User = require('../models/user.js')
+const crypto = require('crypto')
+const User = require('../models/user.js')
+const Article = require('../models/article.js')
 const Jwt = require('../utils/jwt')
 
 // 因为是单页应用 所有请求都走/dist/index.html
@@ -57,13 +58,8 @@ module.exports = function (app) {
     })
 
     // 判断用户是否已存在
-    User.get(user.name, function (err, userInfo) {
-      if (err) {
-        req.flash('error', err);
-        return
-      }
+    User.get(user.name).then(userInfo => {
       if (userInfo.length) {
-        req.flash('error', '用户名已存在！')
         res.send({
           retcode: 10001,
           text: '用户已存在',
@@ -71,17 +67,26 @@ module.exports = function (app) {
         })
         return;
       }
-      // 新增用户
-      user.save(function (err, result) {
-        console.log(result, 'result')
-        if (err) {
-          req.flash('error', err)
-          return;
-        }
-        // req.session.user = user; //用户信息存入 session
-        req.flash('success', '注册成功！')
+      // 用户名不存在——新增用户
+      user.save().then(() => {
+        res.send({
+          retcode: 0,
+          text: '注册成功'
+        })
       })
+        .catch(err => {
+          res.send({
+            retcode: 1,
+            text: '注册失败'
+          })
+        })
     })
+      .catch(err => {
+        res.send({
+          retcode: 1,
+          text: '注册失败'
+        })
+      })
   });
 
   app.post('/login', checkNotLogin)
@@ -98,8 +103,7 @@ module.exports = function (app) {
     })
     // 查询密码是否正确
     User.get(user.name).then(userInfo => {
-
-      if (!userInfo.length) {
+      if (!userInfo) {
         res.send({
           retcode: 10001,
           text: '用户名不存在',
@@ -107,8 +111,7 @@ module.exports = function (app) {
         })
         return;
       }
-      if (userInfo[0].pass !== pass) {
-        console.log(userInfo[0].pass, pass)
+      if (userInfo.pass !== pass) {
         res.send({
           retcode: 10001,
           text: '用户名或密码错误',
@@ -116,17 +119,63 @@ module.exports = function (app) {
         })
         return;
       }
-      //用户名密码都匹配后，将用户信息存入 session
-      // req.session.user = user;
       // 登陆成功，添加token验证
-      let _id = userInfo[0]._id.toString();
+      let _id = userInfo._id.toString();
       // 将用户id传入并生成token
       let jwt = new Jwt(_id);
       let token = jwt.generateToken();
       res.send({
         retcode: 0,
-        value: userInfo[0],
+        value: {
+          userInfo: userInfo
+        },
         token: token
+      })
+    })
+      .catch(err => {
+        res.send({
+          retcode: 1,
+          text: '登录失败'
+        })
+      })
+  })
+
+  // app.post('/logout', checkLogin)
+  // app.post('/logout', function (req, res) {
+
+  // })
+
+  app.post('/post', checkLogin)
+  app.post('/post', function (req, res) {
+    let username = req.body.username,
+      title = req.body.title,
+      content = req.body.content
+
+    const article = new Article(username, title, content)
+
+    article.save().then(() => {
+      res.send({
+        retcode: 0,
+        value: {}
+      })
+    })
+      .catch(err => {
+        res.send({
+          retcode: 1,
+          text: '发布失败'
+        })
+      })
+  })
+
+  app.get('/getBlogList', function (req, res) {
+    Article.get().then(result => {
+      console.log('result:', result)
+      res.send({
+        retcode: 0,
+        text: '注册成功',
+        value: {
+          blogs: result
+        }
       })
     })
   })
