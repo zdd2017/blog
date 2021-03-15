@@ -6,3 +6,13 @@ export function apiGetBlogList() {
         method: 'get'
     })
 }
+
+export function apiViewArticle(id) {
+    return request({
+        url: '/getArticle',
+        method: 'get',
+        params: {
+            id: id
+        }
+    })
+}

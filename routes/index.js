@@ -168,13 +168,38 @@ module.exports = function (app) {
   })
 
   app.get('/getBlogList', function (req, res) {
-    Article.get().then(result => {
-      console.log('result:', result)
+    Article.getById().then(result => {
       res.send({
         retcode: 0,
         text: '注册成功',
         value: {
           blogs: result
+        }
+      })
+    })
+  })
+
+  app.get('/getArticle', function (req, res) {
+    let id = req.query.id;
+    Article.getById(id).then(result => {
+      res.send({
+        retcode: 0,
+        text: '',
+        value: {
+          article: result
+        }
+      })
+    })
+  })
+
+  app.get('/getMyArticle', function (req, res) {
+    let name = req.query.username;
+    Article.getByName(name).then(result => {
+      res.send({
+        retcode: 0,
+        text: '',
+        value: {
+          article: result
         }
       })
     })

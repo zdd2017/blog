@@ -2,7 +2,6 @@ import router from './router'
 import store from './store'
 
 router.beforeEach((to, from, next) => {
-    console.log(to, 'to')
     if (to.matched.some(record => record.meta.requiresLogin)) {
         // 判断是否已登录
         if (store.getters.isLoggedIn) {

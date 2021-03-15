@@ -4,6 +4,8 @@ import Index from '@/views/index'
 import Login from '@/views/login'
 import Register from '@/views/register'
 import Post from '@/views/post'
+import Blog from '@/views/blog'
+import Home from '@/views/home'
 
 Vue.use(Router)
 
@@ -46,6 +48,20 @@ const routes = [{
         requiresLogin: true
     },
     component: Post
+}, {
+    name: 'blog',
+    path: '/blog',
+    meta: {
+        requiresLogin: true
+    },
+    component: Blog
+}, {
+    name: 'home',
+    path: '/home',
+    meta: {
+        requiresLogin: true
+    },
+    component: Home
 }]
 
 export default new Router({ routes })

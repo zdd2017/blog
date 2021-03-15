@@ -1,5 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
+const ObjectId = require('mongodb').ObjectId
 
 // Connection URL
 const url = 'mongodb://localhost:27017';
@@ -15,7 +16,42 @@ function Article(username, title, content) {
 
 module.exports = Article;
 
-Article.get = function () {
+Article.getById = function (id) {
+    return new Promise((resolve, reject) => {
+        // 在数据库中查找
+        MongoClient.connect(url, function (err, client) {
+            assert.strictEqual(null, err);
+            console.log("Connected correctly to server");
+
+            const db = client.db(dbName);
+
+            const collection = db.collection('posts');
+            console.log(id, 'id')
+            // Find some documents
+            if (!id) {
+                collection.find().toArray(function (err, docs) {
+                    assert.strictEqual(err, null);
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(docs)
+                    }
+                });
+            } else {
+                collection.findOne({ '_id': ObjectId(id) }, function (err, docs) {
+                    assert.strictEqual(err, null);
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(docs)
+                    }
+                });
+            }
+        });
+    })
+}
+
+Article.getByName = function (username) {
     return new Promise((resolve, reject) => {
         // 在数据库中查找
         MongoClient.connect(url, function (err, client) {
@@ -26,14 +62,25 @@ Article.get = function () {
 
             const collection = db.collection('posts');
             // Find some documents
-            collection.find().toArray(function (err, docs) {
-                assert.strictEqual(err, null);
-                if (err) {
-                    reject(err)
-                } else {
-                    resolve(docs)
-                }
-            });
+            if (!username) {
+                collection.find().toArray(function (err, docs) {
+                    assert.strictEqual(err, null);
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(docs)
+                    }
+                });
+            } else {
+                collection.findOne({ 'username': username }, function (err, docs) {
+                    assert.strictEqual(err, null);
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve(docs)
+                    }
+                });
+            }
         });
     })
 }

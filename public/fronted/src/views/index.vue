@@ -1,38 +1,19 @@
 <template>
   <div id="index">
-    <el-menu
-      :default-active="activeIndex"
-      class="index-menu el-menu-demo"
-      mode="horizontal"
-      @select="handleSelect"
-    >
-      <el-menu-item index="1"
-        ><router-link to="index">主页</router-link></el-menu-item
-      >
-      <el-menu-item index="2"
-        ><router-link to="login">登录</router-link></el-menu-item
-      >
-      <el-menu-item index="3"><a @click="logout">登出</a></el-menu-item>
-      <el-menu-item index="4"
-        ><router-link to="register">注册</router-link></el-menu-item
-      >
-    </el-menu>
-    <div class="blog-container">
-      <div class="blog-item" v-for="blog in blogs" :key="blog.index">
-        <h1 class="blog-title">{{ blog.title }}</h1>
-        <div class="blog-content" v-html="blog.content"></div>
-      </div>
-    </div>
+    <Header></Header>
+    <article-list :blogs="blogs"></article-list>
   </div>
 </template>
 
 <script>
+import Header from "../components/header.vue";
 import { apiGetBlogList } from "/src/api/index.js";
+import ArticleList from "../components/articleList.vue";
 
 export default {
+  components: { Header, ArticleList },
   data() {
     return {
-      activeIndex: "1",
       blogs: [],
     };
   },
@@ -53,15 +34,29 @@ export default {
         this.blogs = res.value.blogs;
       });
     },
+    view(id) {
+      this.$router.push({ name: "article", params: { id: id } });
+    },
   },
 };
 </script>
 
 <style lang="scss">
 #index {
-  .index-menu {
-    display: flex;
-    justify-content: flex-end;
+  .blog-container {
+    margin: 0 auto;
+    width: 60%;
+    text-align: left;
+    .blog-item {
+      border-bottom: 1px solid #ccc;
+      padding: 10px;
+      .info-container {
+        text-align: right;
+        .authour {
+          margin-right: 10px;
+        }
+      }
+    }
   }
 }
 </style>
