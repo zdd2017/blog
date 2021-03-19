@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const multer = require('multer')
 const User = require('../models/user.js')
 const Article = require('../models/article.js')
 const Jwt = require('../utils/jwt')
@@ -39,6 +40,23 @@ const checkNotLogin = function (req, res, next) {
   }
 }
 
+// var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'public/fronted/dist/images')
+//     //文件保存路径
+//   },
+//   filename: function (req, file, cb) {
+//     console.log("hello")
+//     console.log(file.originalname)
+//     cb(null, file.originalname)
+//     //存储文件名
+//   }
+// })
+
+// let upload = multer({ storage: storage })
+
+let upload = multer({ dest: 'public/fronted/dist/images' })
+
 module.exports = function (app) {
   app.post('/register', checkNotLogin)
   app.post('/register', function (req, res) {
@@ -59,7 +77,7 @@ module.exports = function (app) {
 
     // 判断用户是否已存在
     User.get(user.name).then(userInfo => {
-      if (userInfo.length) {
+      if (userInfo && userInfo.length) {
         res.send({
           retcode: 10001,
           text: '用户已存在',
@@ -71,7 +89,7 @@ module.exports = function (app) {
       user.save().then(() => {
         res.send({
           retcode: 0,
-          text: '注册成功'
+          text: ''
         })
       })
         .catch(err => {
@@ -140,11 +158,40 @@ module.exports = function (app) {
       })
   })
 
+  // 上传图片
+  app.post('/upload', upload.single('file'), async (req, res) => {
+    const file = req.file;
+    console.log(file, 'fileeeee')
+    file.url = `http://localhost:3000/images/${file.filename}`;
+    res.send(file);
+  });
+
+  // 个人资料保存
+  app.post('/setting', checkLogin)
+  app.post('/setting', function (req, res) {
+    let name = req.query.name;
+    User.modify(name, req.body).then((userInfo) => {
+      res.send({
+        retcode: 0,
+        value: {
+          userInfo: userInfo
+        }
+      })
+    })
+      .catch(err => {
+        res.send({
+          retcode: 1,
+          text: '发布失败'
+        })
+      })
+  })
+
   // app.post('/logout', checkLogin)
   // app.post('/logout', function (req, res) {
 
   // })
 
+  // 发布新博客
   app.post('/post', checkLogin)
   app.post('/post', function (req, res) {
     let username = req.body.username,
@@ -167,11 +214,37 @@ module.exports = function (app) {
       })
   })
 
+  // 修改博客
+  app.post('/modify', checkLogin)
+  app.post('/modify', function (req, res) {
+    let id = req.query.id
+    // username = req.body.username,
+    //   title = req.body.title,
+    //   content = req.body.content,
+    console.log(req.body)
+
+    // const article = new Article(username, title, content)
+
+    Article.modify(id, req.body).then(() => {
+      res.send({
+        retcode: 0,
+        value: {}
+      })
+    })
+      .catch(err => {
+        res.send({
+          retcode: 1,
+          text: '发布失败'
+        })
+      })
+  })
+
+  // 获取所有博客
   app.get('/getBlogList', function (req, res) {
     Article.getById().then(result => {
       res.send({
         retcode: 0,
-        text: '注册成功',
+        text: '',
         value: {
           blogs: result
         }
@@ -179,6 +252,7 @@ module.exports = function (app) {
     })
   })
 
+  // 根据博客id查询博客
   app.get('/getArticle', function (req, res) {
     let id = req.query.id;
     Article.getById(id).then(result => {
@@ -192,6 +266,7 @@ module.exports = function (app) {
     })
   })
 
+  // 根据用户名查询博客
   app.get('/getMyArticle', function (req, res) {
     let name = req.query.username;
     Article.getByName(name).then(result => {

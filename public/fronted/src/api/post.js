@@ -7,3 +7,12 @@ export function apiPost(data) {
         data
     })
 }
+
+export function apiModify(id, data) {
+    return request({
+        url: '/modify',
+        method: 'post',
+        params: { id: id },
+        data
+    })
+}

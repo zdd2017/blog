@@ -9,7 +9,7 @@
 <script>
 import E from "wangeditor";
 import store from "../store";
-import { apiPost } from "/src/api/post";
+import { apiPost, apiModify } from "/src/api/post";
 
 export default {
   name: "Post",
@@ -22,6 +22,7 @@ export default {
   },
   // catchData是一个类似回调函数，来自父组件，当然也可以自己写一个函数，主要是用来获取富文本编辑器中的html内容用来传递给服务端
   props: ["catchData"], // 接收父组件的方法
+  created() {},
   mounted() {
     this.editor = new E(this.$refs.editorElem);
     // 编辑器的事件，每次改变会获取其html内容
@@ -30,23 +31,40 @@ export default {
       console.log(this.editorContent);
     };
     this.editor.create(); // 创建富文本实例
+    if (this.$route.params) {
+      this.title = this.$route.params.title;
+      let content = this.$route.params.content;
+      this.editor.txt.html(content);
+    }
   },
   methods: {
     release() {
       if (this.title && this.editorContent) {
-        console.log("userInfo:", store.getters.userInfo);
         let temp = {
           username: store.getters.userInfo.name,
           title: this.title,
           content: this.editorContent,
         };
-        apiPost(temp).then(() => {
-          this.$message({
-            message: "发布成功！",
-            type: "success",
+        // 修改
+        let id = this.$route.params.id;
+        if (id) {
+          apiModify(id, temp).then(() => {
+            this.$message({
+              message: "修改成功！",
+              type: "success",
+            });
+            this.$router.push({ name: "home" });
           });
-          this.$router.push({ name: "index" });
-        });
+        } else {
+          // 新增
+          apiPost(temp).then(() => {
+            this.$message({
+              message: "发布成功！",
+              type: "success",
+            });
+            this.$router.push({ name: "home" });
+          });
+        }
       }
     },
   },

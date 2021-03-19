@@ -82,3 +82,39 @@ User.get = function (name) {
     })
 
 };
+
+// 修改用户信息
+User.modify = function (name, temp) {
+    // console.log(name, temp, 'temp')
+    return new Promise((resolve, reject) => {
+        // Use connect method to connect to the server
+        MongoClient.connect(url, function (err, client) {
+            assert.strictEqual(null, err);
+            console.log("Connected correctly to server");
+
+            const db = client.db(dbName);
+
+            const collection = db.collection('users');
+            // Find some documents
+            collection.updateOne({ 'name': name }, {
+                $set: { nickName: temp.nickName, avatar: temp.avatar, gender: temp.gender }
+            }, function (err, result) {
+                assert.strictEqual(err, null);
+                if (err) {
+                    reject(err)
+                } else {
+                    collection.findOne({ 'name': name }, function (err, docs) {
+                        assert.strictEqual(err, null);
+                        if (err) {
+                            reject(err)
+                        } else {
+                            delete docs.pass
+                            resolve(docs)
+                        }
+                    });
+                }
+            });
+        });
+    })
+
+};

@@ -13,7 +13,13 @@ import { apiViewArticle } from "/src/api/index.js";
 export default {
   data() {
     return {
-      article: null,
+      article: {
+        username: "",
+        time: "",
+        title: "",
+        content: "",
+        _id: "",
+      },
       username: "",
     };
   },
@@ -22,16 +28,18 @@ export default {
     Article,
   },
   created() {
+    console.log("wtf??");
     this.getArticle();
   },
   methods: {
     getArticle() {
       let id = this.$route.params.id;
-      apiViewArticle(id).then((res) => {
-        this.article = res.value.article;
-        this.article.time = res.value.article.time.second;
-        console.log(this.article);
-      });
+      if (id) {
+        apiViewArticle(id).then((res) => {
+          this.article = res.value.article;
+          this.article.time = res.value.article.time.second;
+        });
+      }
     },
   },
 };

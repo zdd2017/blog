@@ -1,6 +1,6 @@
 <template>
   <div id="index">
-    <Header></Header>
+    <Header activeIndex="1"></Header>
     <article-list :blogs="blogs"></article-list>
   </div>
 </template>
@@ -40,23 +40,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-#index {
-  .blog-container {
-    margin: 0 auto;
-    width: 60%;
-    text-align: left;
-    .blog-item {
-      border-bottom: 1px solid #ccc;
-      padding: 10px;
-      .info-container {
-        text-align: right;
-        .authour {
-          margin-right: 10px;
-        }
-      }
-    }
-  }
-}
-</style>

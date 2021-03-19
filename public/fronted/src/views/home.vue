@@ -1,6 +1,6 @@
 <template>
   <div class="article">
-    <Header></Header>
+    <Header activeIndex="2"></Header>
     <article-list :blogs="blogs"></article-list>
   </div>
 </template>
@@ -26,10 +26,12 @@ export default {
   },
   methods: {
     getMyArticle() {
-      let username = store.getters.userInfo.username;
-      apiViewMyArticle(username).then((res) => {
-        this.blogs = res.value.article;
-      });
+      let username = store.getters.userInfo.name;
+      if (username) {
+        apiViewMyArticle(username).then((res) => {
+          this.blogs = res.value.article;
+        });
+      }
     },
   },
 };

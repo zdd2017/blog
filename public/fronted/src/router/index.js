@@ -6,6 +6,7 @@ import Register from '@/views/register'
 import Post from '@/views/post'
 import Blog from '@/views/blog'
 import Home from '@/views/home'
+import Setting from '@/views/setting'
 
 Vue.use(Router)
 
@@ -62,6 +63,13 @@ const routes = [{
         requiresLogin: true
     },
     component: Home
+}, {
+    name: 'setting',
+    path: '/setting',
+    meta: {
+        requiresLogin: true
+    },
+    component: Setting
 }]
 
 export default new Router({ routes })

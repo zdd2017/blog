@@ -26,7 +26,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public/fronted/dist')));
 
 
-
 app.use(session({
   secret: settings.cookieSecret,
   key: settings.db,//cookie name

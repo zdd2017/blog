@@ -10,7 +10,9 @@
             <div class="date">{{ article.time }}</div>
           </div>
         </div>
-        <div class="edit" v-if="username === article.username">编辑文章</div>
+        <div class="edit" v-if="username === article.username" @click="edit">
+          编辑文章
+        </div>
       </div>
       <div class="blog-content" v-html="article.content"></div>
     </div>
@@ -26,6 +28,7 @@ export default {
       type: Object,
       default: () => {
         return {
+          _id: "",
           username: "",
           time: "",
           title: "",
@@ -40,7 +43,19 @@ export default {
     };
   },
   created() {
-    this.username = store.getters.userInfo.username;
+    this.username = store.getters.userInfo.name;
+  },
+  methods: {
+    edit() {
+      this.$router.push({
+        name: "post",
+        params: {
+          title: this.article.title,
+          content: this.article.content,
+          id: this.article._id,
+        },
+      });
+    },
   },
 };
 </script>
@@ -50,6 +65,9 @@ export default {
   margin: 0 auto;
   width: 50%;
   .article-container {
+    .blog-title {
+      cursor: pointer;
+    }
     .info-container {
       position: relative;
       .user-container {
@@ -66,6 +84,7 @@ export default {
         position: absolute;
         bottom: 10px;
         right: 10px;
+        cursor: pointer;
       }
     }
   }

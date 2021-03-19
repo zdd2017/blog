@@ -40,7 +40,18 @@ export default {
     .blog-item {
       border-bottom: 1px solid #ccc;
       padding: 10px;
+      .blog-title {
+        cursor: pointer;
+      }
+      .blog-content {
+        word-break: break-all;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
       .info-container {
+        margin-top: 10px;
         text-align: right;
         .authour {
           margin-right: 10px;

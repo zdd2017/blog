@@ -96,8 +96,12 @@ export default {
   },
   methods: {
     submitForm() {
-      apiRegister(this.form).then((res) => {
-        console.log(res);
+      apiRegister(this.form).then(() => {
+        this.$message({
+          message: "注册成功！",
+          type: "success",
+        });
+        this.$router.push({ name: "login" });
       });
     },
   },
