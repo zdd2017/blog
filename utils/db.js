@@ -32,4 +32,4 @@ function query(options) {
   })
 }
 
-module.exports.query = query
+module.exports = sequelize

@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router()
 const authMap = require("../permissions/auth")
 const errcode = require("../utils/errorcode")
-const dbUtils = require("../utils/db")
+const sequelize = require("../utils/db")
 
 router.use(async (req, res, next) => {
   const authority = authMap.get(req.path)
@@ -18,8 +18,10 @@ router.use(async (req, res, next) => {
   }
   // 鉴权
   try {
-    await dbUtils.query()
+    await sequelize.authenticate()
+    console.log("Connection has been established successfully.")
   } catch (error) {
+    console.error("Unable to connect to the database:", error)
     return res.send(errcode.DB.CONNECT_EXCEPTION)
   }
 })
