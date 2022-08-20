@@ -1,5 +1,5 @@
 const authMap = new Map()
 
-authMap.set('')
+// authMap.set('/article/page', true)
 
 module.exports = authMap

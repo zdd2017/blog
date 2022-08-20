@@ -7,7 +7,10 @@ const config = require("../config")
 router.post("/login", async function (req, res) {
   try {
     // 校验用户名密码是否正确
-    const users = await User.findUser(req.body.username, req.body.password)
+    const users = await User.findUser({
+      userName: req.body.username,
+      password: req.body.password,
+    })
     if (!users.length) {
       res.send({
         code: "001003",

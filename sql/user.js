@@ -28,12 +28,9 @@ const User = sequelize.define(
   }
 )
 
-const findUser = function (userName, password) {
+const findUser = function (opts) {
   return User.findAll({
-    where: {
-      userName,
-      password,
-    },
+    where: opts,
   })
 }
 
